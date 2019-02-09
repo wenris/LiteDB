@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,8 @@ namespace LiteDB
 {
     public partial class BsonMapper
     {
+        public event Func<Type, object, object> SerializeAction;
+
         /// <summary>
         /// Serialize a entity class to BsonDocument
         /// </summary>
@@ -39,6 +41,8 @@ namespace LiteDB
 
             // if is already a bson value
             if (obj is BsonValue) return new BsonValue((BsonValue)obj);
+
+            else if (SerializeAction?.Invoke(type, obj) is BsonValue val) return val;
 
             // test string - mapper has some special options
             else if (obj is String)

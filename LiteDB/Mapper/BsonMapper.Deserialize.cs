@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +8,8 @@ namespace LiteDB
 {
     public partial class BsonMapper
     {
+        public event Func<Type, BsonValue, object> DeserializeHook;
+
         /// <summary>
         /// Deserialize a BsonDocument to entity class
         /// </summary>
@@ -78,6 +80,8 @@ namespace LiteDB
 
             // null value - null returns
             if (value.IsNull) return null;
+
+            else if (DeserializeHook?.Invoke(type, value) is object obj) return obj;
 
             // if is nullable, get underlying type
             else if (Reflection.IsNullable(type))
